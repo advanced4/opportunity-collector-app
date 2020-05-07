@@ -1,0 +1,7 @@
+.idea
+config.json
+*.csv
+build/
+dist/
+__pycache__/
+*.spec

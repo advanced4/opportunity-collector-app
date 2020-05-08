@@ -1052,30 +1052,38 @@ class MainGui(Tk):
 
         # we've already checked in cfg_bootstrap that at least one of these is enabled
         # create the widgets for the top part of the GUI, and lay them out
+
+        # can't change the size of buttons on macOs :/, so these are labels now
+        # https://stackoverflow.com/questions/25951262/how-to-adjust-tkinter-button-height
         if sam_enabled:
-            Button(self, relief=GROOVE, text="Sam.gov", command=self.on_sam).pack(fill=BOTH, expand=True, padx=20, pady=10)
+            # Button(self, relief=GROOVE, text="Sam.gov", command=self.on_sam).pack(fill=BOTH, expand=True, padx=20, pady=10)
+            sl = Label(self, relief=GROOVE, text="Sam.gov")
+            sl.bind("<Button>", self.on_sam)
+            sl.pack(fill=BOTH, expand=True, padx=20, pady=10)
 
         if grants_enabled:
-            Button(self, relief=GROOVE, text="Grants.gov", command=self.on_grants).pack(fill=BOTH, expand=True, padx=20, pady=10)
+            gl = Label(self, relief=GROOVE, text="Grants.gov")
+            gl.bind("<Button>", self.on_grants)
+            gl.pack(fill=BOTH, expand=True, padx=20, pady=10)
 
         center(self)
         self.after(1, lambda: self.focus_force())  # for some reason, we don't get focus after spawning another window so we force it
 
-    def on_sam(self):
+    def on_sam(self, e):
         self.destroy()
         global sam_gui
         sam_gui = SamConfigure()
         sam_gui.mainloop()
 
-    def bye(self):
-        self.destroy()
-        bye_global()
-
-    def on_grants(self):
+    def on_grants(self, e):
         self.destroy()
         global grants_gui
         grants_gui = GrantsConfigure()
         grants_gui.mainloop()
+
+    def bye(self):
+        self.destroy()
+        bye_global()
 
 
 if __name__ == "__main__":

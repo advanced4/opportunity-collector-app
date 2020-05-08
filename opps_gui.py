@@ -575,7 +575,7 @@ class YellAtSomeoneAndQuit(Tk):
         # this causes an issue on Mac's if we don't kill the other window before ultimately
         # calling destroy on ourself
         if master_window is not None:
-            master_window.destroy()
+            self.master = master_window
         self.title(msg_type)
         self.geometry("480x320")
         self.protocol('WM_DELETE_WINDOW', self.bye)
@@ -590,6 +590,8 @@ class YellAtSomeoneAndQuit(Tk):
         self.mainloop()
 
     def bye(self):
+        if self.master:
+            self.master.destroy()
         self.destroy()
         bye_global()
 

@@ -21,7 +21,7 @@ Is a self contained exe that can be ran by double clicking it
 Is a self contained ELF file. `chmod +x ${thefile}` then execute it
 
 ### Mac
-Is a zip archive containing an application (a *.app folder). Extract the application,
+Is a zip archive containing an application (an *.app folder). Extract the application,
 place it in your Applications folder, and double click
 
 ## From Source

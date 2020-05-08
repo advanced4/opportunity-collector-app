@@ -33,7 +33,6 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 conf_path = script_path + sep + "config.json"
 if platform.system() == "Darwin":
     import getpass
-
     username = getpass.getuser()
     outdir = "/Users/" + username + "/Documents/"
 else:
@@ -137,6 +136,14 @@ def valid_date(datestring):
         return False
 
 
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+
 def get_sam_opps():
     latest = get_latest_csv("__sam")
     if today == latest:
@@ -179,8 +186,8 @@ def get_sam_opps():
                                                    'postedTo': to_date, "ptype": ptype, "ncode": ncode_dict['code']})
             data = json.loads(r.text)
             if "error" in data:
-                sam_gui.get_button["state"] = "normal"
-                YellAtSomeoneAndQuit("Error", data['error']['code'], master_window=sam_gui)
+                messagebox.showerror("Error", data['error']['code'])
+                bye_global()
                 # print(r.headers)
                 return
 
@@ -207,21 +214,12 @@ def get_sam_opps():
             dict_writer = csv.DictWriter(output_file, keys)
             dict_writer.writeheader()
             dict_writer.writerows(opps)
-        YellAtSomeoneAndQuit("Info", "Done! Output is at: " + outfile, sam_gui)
-        sam_gui.get_button["state"] = "normal"
+        messagebox.showinfo("Info", "Done! Output is at: " + outfile)
+        bye_global()
         return
     sam_gui.get_button["state"] = "normal"
     yell_at_someone("Info", "No results")
-
     return
-
-
-def is_int(s):
-    try:
-        int(s)
-        return True
-    except ValueError:
-        return False
 
 
 def get_grants():
@@ -271,7 +269,9 @@ def get_grants():
         with open(outfile, "w") as of:
             of.write(r.text)
         grants_gui.get_button["state"] = "normal"
-        YellAtSomeoneAndQuit("Info", "Done! Output is at: " + outfile, master_window=grants_gui)
+        messagebox.showinfo("Info", "Done! Output is at: " + outfile)
+        bye_global()
+        return
     elif r.status_code == 404:
         grants_gui.get_button["state"] = "normal"
         yell_at_someone("Info", "No results")
@@ -569,13 +569,11 @@ def yell_at_someone(msg_type, msg):
 
 # Used to spawn a window when a fatal error occurs, which forces
 # the program to quit once "exit" or the "x" is clicked
+# Due to some issue w/ Macs, this should not be called if another window already exists
+# use messagebox.showerror() & bye_global() instead
 class YellAtSomeoneAndQuit(Tk):
-    def __init__(self, msg_type, msg, master_window=None):
+    def __init__(self, msg_type, msg):
         super().__init__()
-        # this causes an issue on Mac's if we don't kill the other window before ultimately
-        # calling destroy on ourself
-        if master_window is not None:
-            self.master = master_window
         self.title(msg_type)
         self.geometry("480x320")
         self.protocol('WM_DELETE_WINDOW', self.bye)
@@ -590,8 +588,6 @@ class YellAtSomeoneAndQuit(Tk):
         self.mainloop()
 
     def bye(self):
-        if self.master:
-            self.master.destroy()
         self.destroy()
         bye_global()
 

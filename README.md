@@ -18,7 +18,7 @@ See the releases page to download precompiled binaries for your platform.
 Is a self contained exe that can be ran by double clicking it
 
 ### Linux
-Is a self contained ELF file that can be executed
+Is a self contained ELF file. `chmod +x ${thefile}` then execute it
 
 ### Mac
 Is a zip archive containing an application (a *.app folder). Extract the application,

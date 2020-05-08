@@ -131,6 +131,7 @@ def valid_date(datestring):
 def get_sam_opps():
     latest = get_latest_csv("__sam")
     if today == latest:
+        sam_gui.get_button["state"] = "normal"
         yell_at_someone("Warning", "You already ran a search within the past 24 hours.\n"
                                    "This is OK to do within reason, but there are API limits.\n"
                                    "If you want to run it again, [re]move the latest result\n"
@@ -141,6 +142,7 @@ def get_sam_opps():
     to_date = sam_gui.to_date_e.get()
 
     if not valid_date(to_date) or not valid_date(from_date):
+        sam_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "Date format is bad")
         return
 
@@ -148,10 +150,12 @@ def get_sam_opps():
     from_date_dt = datetime.strptime(from_date, '%m/%d/%Y')
 
     if from_date_dt > to_date_dt:
+        sam_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "'To Date' must be greater than 'From Date'")
         return
 
     if to_date_dt > today_dt:
+        sam_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "To Date can't be greater than today's date")
         return
 
@@ -166,9 +170,9 @@ def get_sam_opps():
                                                    'postedTo': to_date, "ptype": ptype, "ncode": ncode_dict['code']})
             data = json.loads(r.text)
             if "error" in data:
+                sam_gui.get_button["state"] = "normal"
                 YellAtSomeoneAndQuit("Error", data['error']['code'])
                 # print(r.headers)
-                sam_gui.get_button["state"] = "normal"
                 return
 
             if "opportunitiesData" in data:
@@ -210,16 +214,19 @@ def is_int(s):
 
 def get_grants():
     if not is_int(grants_gui.past_days.get()):
+        grants_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "Bad value for date range")
         return
 
     past_days = int(grants_gui.past_days.get())
 
     if past_days > 365:
+        grants_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "Date range is too big")
         return
 
     if past_days < 1:
+        grants_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "Date range is too small")
         return
 
@@ -228,12 +235,15 @@ def get_grants():
     outfile = script_path + sep + past_date.strftime("%Y-%m-%d") + "__" + datetime.now().strftime("%Y-%m-%d") + "__grants.csv"
 
     if len(cfg["grants_cats"]) < 1:
+        grants_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "You must select at least one category")
         return
     if len(cfg["grants_instruments"]) < 1:
+        grants_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "You must select at least one instrument")
         return
     if len(cfg["grants_eligibilities"]) < 1:
+        grants_gui.get_button["state"] = "normal"
         yell_at_someone("Error", "You must select at least one eligibility")
         return
 
@@ -575,12 +585,11 @@ class GetInputOrDie(Tk):
     def __init__(self, msg="Input", instructions=None):
         super().__init__()
         self.title(msg)
-        self.geometry("520x380")
         self.protocol('WM_DELETE_WINDOW', self.bye)
 
         Label(self, text=msg).pack()
         if instructions:
-            Label(self, text=instructions, justify=LEFT, anchor=W, width=420, wraplength=480).pack(fill=BOTH, padx=20, pady=15)
+            Label(self, text=instructions, justify=LEFT).pack(fill=BOTH, padx=20, pady=15)
 
         self.e = Entry(self, width=50)
         self.e.pack(pady=20)

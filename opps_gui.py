@@ -180,7 +180,7 @@ def get_sam_opps():
             data = json.loads(r.text)
             if "error" in data:
                 sam_gui.get_button["state"] = "normal"
-                YellAtSomeoneAndQuit("Error", data['error']['code'])
+                YellAtSomeoneAndQuit("Error", data['error']['code'], master_window=sam_gui)
                 # print(r.headers)
                 return
 
@@ -190,8 +190,11 @@ def get_sam_opps():
             else:
                 sam_gui.add_log("No results for NAICS: " + str(ncode_dict['code']) + " solicitation type: " + ptype)
 
-            # TODO lets skip this if its the last one pls thx
-            time.sleep(5)
+            if ptype == ptypes[-1] and ncode_dict == ncodes[-1]:
+                # then this was the last iteration, so don't make the user wait any longer
+                pass
+            else:
+                time.sleep(2)
     sam_gui.add_log("Done!")
 
     set_of_jsons = {json.dumps(d, sort_keys=True) for d in opps}
@@ -204,7 +207,7 @@ def get_sam_opps():
             dict_writer = csv.DictWriter(output_file, keys)
             dict_writer.writeheader()
             dict_writer.writerows(opps)
-        YellAtSomeoneAndQuit("Info", "Done! Output is at: " + outfile)
+        YellAtSomeoneAndQuit("Info", "Done! Output is at: " + outfile, sam_gui)
         sam_gui.get_button["state"] = "normal"
         return
     sam_gui.get_button["state"] = "normal"
@@ -268,7 +271,7 @@ def get_grants():
         with open(outfile, "w") as of:
             of.write(r.text)
         grants_gui.get_button["state"] = "normal"
-        YellAtSomeoneAndQuit("Info", "Done! Output is at: " + outfile)
+        YellAtSomeoneAndQuit("Info", "Done! Output is at: " + outfile, master_window=grants_gui)
     elif r.status_code == 404:
         grants_gui.get_button["state"] = "normal"
         yell_at_someone("Info", "No results")
@@ -567,8 +570,12 @@ def yell_at_someone(msg_type, msg):
 # Used to spawn a window when a fatal error occurs, which forces
 # the program to quit once "exit" or the "x" is clicked
 class YellAtSomeoneAndQuit(Tk):
-    def __init__(self, msg_type, msg):
+    def __init__(self, msg_type, msg, master_window=None):
         super().__init__()
+        # this causes an issue on Mac's if we don't kill the other window before ultimately
+        # calling destroy on ourself
+        if master_window is not None:
+            master_window.destroy()
         self.title(msg_type)
         self.geometry("480x320")
         self.protocol('WM_DELETE_WINDOW', self.bye)

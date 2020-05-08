@@ -3,6 +3,7 @@
 import csv
 import json
 import os
+import platform
 import random
 import threading
 import time
@@ -30,6 +31,14 @@ sol_typ_plain_abv_map = {"sam_justification": "u", "sam_presol": "p", "sam_award
 sol_typ_abv_plain_map = {value: key for key, value in sol_typ_plain_abv_map.items()}
 script_path = os.path.dirname(os.path.realpath(__file__))
 conf_path = script_path + sep + "config.json"
+if platform.system() == "Darwin":
+    import getpass
+
+    username = getpass.getuser()
+    outdir = "/Users/" + username + "/Documents/"
+else:
+    outdir = script_path + sep
+
 sam_endpoint = "https://api.sam.gov/prod/opportunities/v1/search"
 grants_endpoint = "https://www.grants.gov/grantsws/rest/opportunities/search/csv/download?osjp="
 today = datetime.now().strftime('%m/%d/%Y')
@@ -190,7 +199,7 @@ def get_sam_opps():
 
     if len(opps) > 0:
         keys = opps[0].keys()
-        outfile = script_path + sep + from_date.replace("/", "-") + "__" + to_date.replace("/", "-") + "__sam.csv"
+        outfile = outdir + from_date.replace("/", "-") + "__" + to_date.replace("/", "-") + "__sam.csv"
         with open(outfile, 'w', newline='') as output_file:
             dict_writer = csv.DictWriter(output_file, keys)
             dict_writer.writeheader()
@@ -232,7 +241,7 @@ def get_grants():
 
     past_date = datetime.now() - timedelta(past_days)
 
-    outfile = script_path + sep + past_date.strftime("%Y-%m-%d") + "__" + datetime.now().strftime("%Y-%m-%d") + "__grants.csv"
+    outfile = outdir + past_date.strftime("%Y-%m-%d") + "__" + datetime.now().strftime("%Y-%m-%d") + "__grants.csv"
 
     if len(cfg["grants_cats"]) < 1:
         grants_gui.get_button["state"] = "normal"

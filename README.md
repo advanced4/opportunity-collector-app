@@ -12,17 +12,28 @@ to your needs, and it will stay that way on each usage
 
 # Installation
 ## Pre-built binaries
-See the releases page to download precombiled binaries for your platform.
+See the releases page to download precompiled binaries for your platform.
+
+### Windows
+Is a self contained exe that can be ran by double clicking it
+
+### Linux
+Is a self contained ELF file that can be executed
+
+### Mac
+Is a zip archive containing an application (a *.app folder). Extract the application,
+place it in your Applications folder, and double click
 
 ## From Source
 Note: this was written in Python 3.8, but probably works on any python3.X
-1. `git clone $thisRepo`
-2. `pip install tkinter`
-3. `python opp_gui.py`
+1. `git clone https://github.com/advanced4/opportunity-collector`
+2. `cd opportunity-collector`
+3. `pip install tkinter requests` (may not be needed. some python distributions include both, one, or none of these)
+4. `python opp_gui.py`
 
 # Notes
 I'm not an application GUI programmer so keep that in mind. It's not the prettiest,
- but should be acceptable.
+ but should be acceptable & functional.
 
 ## grants.gov
 * eligibilities: all government entities & tribal entities are omitted as these are uncommon

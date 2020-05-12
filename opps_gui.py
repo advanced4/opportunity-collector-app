@@ -266,7 +266,7 @@ def get_grants():
 
     r = requests.get(grants_endpoint + encoded_params)
     if r.status_code == 200:
-        with open(outfile, "w") as of:
+        with open(outfile, "w", encoding="utf-8") as of:
             of.write(r.text)
         grants_gui.get_button["state"] = "normal"
         messagebox.showinfo("Info", "Done! Output is at: " + outfile)
